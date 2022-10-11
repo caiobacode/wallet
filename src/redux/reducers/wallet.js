@@ -1,4 +1,5 @@
-import { GET_CUR, FAIL_CUR, SUCESS_CUR_GET, GET_EXPENSE } from '../actions';
+import { GET_CUR, FAIL_CUR, SUCESS_CUR_GET,
+  GET_EXPENSE, REMOVE_EXPENSE } from '../actions';
 
 const INITIAL_STATE = {
   currencies: [],
@@ -34,6 +35,12 @@ const wallet = (state = INITIAL_STATE, action) => {
         exchangeRates: action.payloadAPI,
       }],
     };
+  case REMOVE_EXPENSE: {
+    return {
+      ...state,
+      expenses: [...action.payload],
+    };
+  }
   default:
     return state;
   }

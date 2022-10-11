@@ -1,8 +1,15 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import Proptype from 'prop-types';
+import { deleteExpense } from '../redux/actions';
 
 class Table extends Component {
+  handleClickDelete = ({ target: { id } }) => {
+    const { expenses, dispatch } = this.props;
+    const newList = expenses.filter((element) => Number(element.id) !== Number(id));
+    dispatch(deleteExpense(newList));
+  };
+
   cambio = (element) => {
     const naoSei = element.exchangeRates[element.currency].ask;
     const sla = (Number(element.value) * Number(naoSei));
@@ -43,7 +50,16 @@ class Table extends Component {
                   <td>{Number(curr).toFixed(2)}</td>
                   <td>{this.cambio(item)}</td>
                   <td>Real</td>
-                  <td>NADA</td>
+                  <td>
+                    <button
+                      data-testid="delete-btn"
+                      type="button"
+                      id={ item.id }
+                      onClick={ this.handleClickDelete }
+                    >
+                      Excluir
+                    </button>
+                  </td>
                 </tr>
               );
             })
@@ -60,6 +76,7 @@ const mapStateToProps = (state) => ({
 
 Table.propTypes = {
   expenses: Proptype.arrayOf.isRequired,
+  dispatch: Proptype.string.isRequired,
 };
 
 export default connect(mapStateToProps)(Table);

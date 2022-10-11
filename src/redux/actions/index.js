@@ -10,6 +10,12 @@ export const submitEmail = (email) => ({
 export const GET_CUR = 'GET_CUR';
 export const SUCESS_CUR_GET = 'SUCESS_CUR_GET';
 export const FAIL_CUR = 'FAIL_CUR';
+export const REMOVE_EXPENSE = 'REMOVE_EXPENSE';
+
+export const deleteExpense = (payload) => ({
+  type: REMOVE_EXPENSE,
+  payload,
+});
 
 export const getCur = () => ({
   type: GET_CUR,
