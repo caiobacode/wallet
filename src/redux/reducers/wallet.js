@@ -1,4 +1,4 @@
-import { GET_CUR, FAIL_CUR, SUCESS_CUR_GET,
+import { GET_CUR, SUCESS_CUR_GET,
   GET_EXPENSE, REMOVE_EXPENSE } from '../actions';
 
 const INITIAL_STATE = {
@@ -16,11 +16,6 @@ const wallet = (state = INITIAL_STATE, action) => {
     return {
       ...state,
       currencies: action.payload,
-    };
-  case FAIL_CUR:
-    return {
-      ...state,
-      error: action.err,
     };
   case GET_EXPENSE:
     return {

@@ -1,20 +1,38 @@
 import React, { Component } from 'react';
 import PropType from 'prop-types';
 import { connect } from 'react-redux';
-import { getCurrencies, thunk } from '../redux/actions';
+import { getCurrencies, thunk, deleteExpense } from '../redux/actions';
+
+const firstState = {
+  expenseValue: '',
+  description: '',
+  cambio: 'USD',
+  payment: 'Dinheiro',
+  tag: 'Alimentação',
+  editOrNot: false,
+};
 
 class WalletForm extends Component {
-  state = {
-    expenseValue: '',
-    description: '',
-    cambio: 'USD',
-    payment: 'Dinheiro',
-    tag: 'Alimentação',
-  };
+  state = firstState;
 
   componentDidMount() {
-    const { dispatch } = this.props;
+    const { dispatch, editElement } = this.props;
+    console.log(editElement);
     dispatch(getCurrencies());
+  }
+
+  componentDidUpdate(prevProps) {
+    const { editElement } = this.props;
+    if (prevProps.editElement !== editElement) {
+      this.setState({
+        expenseValue: editElement.value,
+        description: editElement.description,
+        cambio: editElement.currency,
+        payment: editElement.method,
+        tag: editElement.tag,
+        editOrNot: true,
+      });
+    }
   }
 
   handleChange = ({ target }) => {
@@ -25,18 +43,29 @@ class WalletForm extends Component {
   handleClick = () => {
     const { dispatch } = this.props;
     dispatch(thunk(this.state));
-    this.setState({
-      expenseValue: '',
-      description: '',
-      cambio: 'USD',
-      payment: 'Dinheiro',
-      tag: 'Alimentação',
+    this.setState(firstState);
+  };
+
+  handleClickEdit = () => {
+    const { dispatch, expences, editElement } = this.props;
+    const { expenseValue, description, cambio, payment, tag } = this.state;
+    const newExpences = [...expences];
+    newExpences.forEach((ex) => {
+      if (ex.id === editElement.id) {
+        newExpences[editElement.id].currency = cambio;
+        newExpences[editElement.id].description = description;
+        newExpences[editElement.id].method = payment;
+        newExpences[editElement.id].value = expenseValue;
+        newExpences[editElement.id].tag = tag;
+      }
     });
+    dispatch(deleteExpense(newExpences));
+    this.setState(firstState);
   };
 
   render() {
     const { data } = this.props;
-    const { expenseValue, description, cambio, payment, tag } = this.state;
+    const { expenseValue, description, cambio, payment, tag, editOrNot } = this.state;
     return (
       <form>
         <label htmlFor="expenseValue">
@@ -106,13 +135,24 @@ class WalletForm extends Component {
             <option>Saúde</option>
           </select>
         </label>
-
-        <button
-          type="button"
-          onClick={ this.handleClick }
-        >
-          Adicionar despesa
-        </button>
+        {
+          editOrNot ? (
+            <button
+              type="button"
+              data-testid="edit-input-btn"
+              onClick={ this.handleClickEdit }
+            >
+              Editar despesa
+            </button>)
+            : (
+              <button
+                type="button"
+                data-testid="add-btn"
+                onClick={ this.handleClick }
+              >
+                Adicionar despesa
+              </button>)
+        }
 
       </form>
     );
@@ -121,9 +161,12 @@ class WalletForm extends Component {
 
 const mapStateToProps = (state) => ({
   data: state.wallet.currencies,
+  expences: state.wallet.expenses,
 });
 
 WalletForm.propTypes = {
+  expences: PropType.arrayOf.isRequired,
+  editElement: PropType.shape.isRequired,
   dispatch: PropType.func.isRequired,
   data: PropType.arrayOf.isRequired,
 };

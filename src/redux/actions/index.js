@@ -11,9 +11,15 @@ export const GET_CUR = 'GET_CUR';
 export const SUCESS_CUR_GET = 'SUCESS_CUR_GET';
 export const FAIL_CUR = 'FAIL_CUR';
 export const REMOVE_EXPENSE = 'REMOVE_EXPENSE';
+export const EDIT_EXPENSE = 'EDIT_EXPENSE';
 
 export const deleteExpense = (payload) => ({
   type: REMOVE_EXPENSE,
+  payload,
+});
+
+export const editExpense = (payload) => ({
+  type: EDIT_EXPENSE,
   payload,
 });
 
@@ -26,21 +32,12 @@ export const sucessCurGet = (payload) => ({
   payload,
 });
 
-export const failCur = (err) => ({
-  type: FAIL_CUR,
-  err,
-});
-
 export const getCurrencies = () => async (dispatch) => {
   dispatch(getCur());
-  try {
-    const payload = await returnAPI();
-    delete payload.USDT;
-    const codigos = Object.entries(payload).map((element) => element[1].code);
-    dispatch(sucessCurGet(codigos));
-  } catch (err) {
-    dispatch(failCur(err));
-  }
+  const payload = await returnAPI();
+  delete payload.USDT;
+  const codigos = Object.entries(payload).map((element) => element[1].code);
+  dispatch(sucessCurGet(codigos));
 };
 
 export const GET_EXPENSE = 'GET_EXPENSE';
@@ -51,17 +48,8 @@ const getExpense = (payloadAPI, info) => ({
   info,
 });
 
-const expenseFail = (err) => ({
-  type: EXPENSE_ERROR,
-  err,
-});
-
 export const thunk = (info) => async (dispatch) => {
-  try {
-    const data = await returnAPI();
-    delete data.USDT;
-    dispatch(getExpense(data, info));
-  } catch (err) {
-    dispatch(expenseFail(err));
-  }
+  const data = await returnAPI();
+  delete data.USDT;
+  dispatch(getExpense(data, info));
 };

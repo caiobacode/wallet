@@ -5,9 +5,20 @@ import { deleteExpense } from '../redux/actions';
 
 class Table extends Component {
   handleClickDelete = ({ target: { id } }) => {
+    console.log(id);
     const { expenses, dispatch } = this.props;
     const newList = expenses.filter((element) => Number(element.id) !== Number(id));
     dispatch(deleteExpense(newList));
+  };
+
+  handleClickEdit = ({ target: { id } }) => {
+    const { expenses, changeInput } = this.props;
+    expenses.forEach((element) => {
+      if (Number(element.id) === Number(id)) {
+        changeInput(element);
+      }
+    });
+    //  dispatch(deleteExpense(newList));
   };
 
   cambio = (element) => {
@@ -51,14 +62,25 @@ class Table extends Component {
                   <td>{this.cambio(item)}</td>
                   <td>Real</td>
                   <td>
-                    <button
-                      data-testid="delete-btn"
-                      type="button"
-                      id={ item.id }
-                      onClick={ this.handleClickDelete }
-                    >
-                      Excluir
-                    </button>
+                    <div>
+
+                      <button
+                        data-testid="delete-btn"
+                        type="button"
+                        id={ item.id }
+                        onClick={ this.handleClickDelete }
+                      >
+                        Excluir
+                      </button>
+                      <button
+                        data-testid="edit-btn"
+                        type="button"
+                        id={ item.id }
+                        onClick={ this.handleClickEdit }
+                      >
+                        Editar
+                      </button>
+                    </div>
                   </td>
                 </tr>
               );
@@ -75,6 +97,7 @@ const mapStateToProps = (state) => ({
 });
 
 Table.propTypes = {
+  changeInput: Proptype.func.isRequired,
   expenses: Proptype.arrayOf.isRequired,
   dispatch: Proptype.string.isRequired,
 };
